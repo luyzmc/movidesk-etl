@@ -65,13 +65,18 @@ def capture_questions():
     db.disconect()
 
 
-def capture_responses():
+def capture_responses(only_news=False):
     _has_more = True
     _last = ''
-    _i = 0
+    _last_response_date = ''
     db = DB.connect()
+    if only_news:
+        resp = db.fetchone('select response_date from movidesk_responses order by response_date desc limit 1')
+        if resp is not None:
+            _last_response_date = resp[0]
+    _i = 0
     while _has_more:
-        responses_text = movidesk.responses(_last)
+        responses_text = movidesk.responses(_last, str(_last_response_date).replace(' ', 'T'))
         responses = json.loads(responses_text)
         _has_more = responses.get('hasMore')
         for response in responses.get('items'):
@@ -107,7 +112,7 @@ def capture_responses():
 
             _i += 1
             print(f"{_i}: {_id}, {_question_id}, {_type}, {_ticket_id}, {_client_id}, "
-                  f"{_response_date}, {_value}, {_commentary.encode('utf-8').decode('unicode-escape')}")
+                  f"{_response_date}, {_value}, {_commentary}")
             _last = _id
         db.commit()
     db.disconect()
@@ -116,4 +121,4 @@ def capture_responses():
 if __name__ == '__main__':
     # create_tables()
     capture_questions()
-    capture_responses()
+    capture_responses(True)
