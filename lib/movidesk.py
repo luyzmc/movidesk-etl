@@ -1,5 +1,7 @@
 import requests
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 URL = os.getenv('MOVIDESK_URL')
 TOKEN = os.getenv('MOVIDESK_TOKEN')

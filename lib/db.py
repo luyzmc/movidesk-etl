@@ -1,5 +1,7 @@
 import psycopg2
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 DB_HOST = os.getenv('DB_HOST')
 DB_NAME = os.getenv('DB_NAME')
@@ -42,3 +44,14 @@ def execute(query: str):
             cur.close()
         if conn is not None:
             conn.close()
+
+
+def create_table_movidesk_questions():
+    execute("""create table movidesk_questions(
+        id varchar(20) not null,
+        is_active boolean not null,
+        type int not null,
+        description varchar(255)
+    )""")
+    execute("""create unique index movidesk_questions_id_uindex on movidesk_questions (id)""")
+    execute("""alter table movidesk_questions add constraint movidesk_questions_pk primary key (id);""")
