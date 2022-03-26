@@ -1,6 +1,7 @@
 import psycopg2
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 DB_HOST = os.getenv('DB_HOST')
@@ -54,4 +55,22 @@ def create_table_movidesk_questions():
         description varchar(255)
     )""")
     execute("""create unique index movidesk_questions_id_uindex on movidesk_questions (id)""")
-    execute("""alter table movidesk_questions add constraint movidesk_questions_pk primary key (id);""")
+    execute("""alter table movidesk_questions add constraint movidesk_questions_pk primary key (id)""")
+
+
+def create_table_movidesk_responses():
+    execute("""create table movidesk_responses(
+        id varchar(20) not null,
+        question_id varchar(20) not null,
+        type int not null,
+        ticket_id int not null,
+        client_id varchar(25) not null,
+        response_date timestamp not null,
+        value int,
+        commentary text
+    )""")
+    execute("""create unique index movidesk_responses_id_uindex on movidesk_responses (id)""")
+    execute("""alter table movidesk_responses add constraint movidesk_responses_pk primary key (id)""")
+    execute("""alter table movidesk_responses 
+        add constraint movidesk_responses_movidesk_questions_id_fk 
+        foreign key (question_id) references movidesk_questions""")

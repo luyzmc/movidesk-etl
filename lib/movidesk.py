@@ -13,7 +13,7 @@ def questions():
     return response.text
 
 
-def responses(after: str = None):
-    url = f"{URL}/survey/questions?token={TOKEN}&startingAfter={after}"
+def responses(after: str = ''):
+    url = f"{URL}/survey/responses?token={TOKEN}&startingAfter={after}"
     response = requests.request("GET", url)
     return response.text
