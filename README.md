@@ -1,3 +1,11 @@
+# Projeto de estudo
+Processo inicial de etl
+
+Lendo as informações de pesquisas e respostas de satisfação do cliente API do Movidesk
+
+Escrevendo em um BD postgres
+
+
 # Configurar
 
 ### Intalar componetes
@@ -8,6 +16,4 @@
 
 # Executar
 
-1. Aa
-2. Bb
-3. Cc
+...
