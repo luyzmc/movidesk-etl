@@ -34,7 +34,7 @@ def create_tables():
     db.commit()
     db.disconect()
 
-
+# centralizando perguntas da pesquisa de satisfação
 def capture_questions():
     questions_text = movidesk.questions()
     questions = json.loads(questions_text)
@@ -64,22 +64,22 @@ def capture_questions():
     db.commit()
     db.disconect()
 
-
+# centralizando Respostas da pesquisa de satisfação
 def capture_responses(only_news=False):
-    _has_more = True
-    _last = ''
-    _last_response_date = ''
-    db = DB.connect()
-    if only_news:
+    _has_more = True                              # Parametro inicial para ver se tem mais paginas para serem consultadas na API
+    _last = ''                                    # Parametro inicial para quant de linhas
+    _last_response_date = ''                      # Parametro inicial para data da ultima respsta em banco
+    db = DB.connect()                             # Abre conexão com banco de dados para consultar a ultima data de resposta e fazer os updates ou insert necessarios.
+    if only_news:                                 # Verificar no banco de dados a ultima data de resposta e armazena em uma variavel
         resp = db.fetchone('select response_date from movidesk_responses order by response_date desc limit 1')
         if resp is not None:
             _last_response_date = resp[0]
-    _i = 0
-    while _has_more:
-        responses_text = movidesk.responses(_last, str(_last_response_date).replace(' ', 'T'))
-        responses = json.loads(responses_text)
-        _has_more = responses.get('hasMore')
-        for response in responses.get('items'):
+    _i = 0                                        # Contagem de linhas que estão sendo inseridas
+    while _has_more:                              # Enquanto _has_more = true consulte as paginas
+        responses_text = movidesk.responses(_last, str(_last_response_date).replace(' ', 'T')) # variavel armazena os dados obtidos via API
+        responses = json.loads(responses_text)    # Função que transforma os dados obtidos em um Json
+        _has_more = responses.get('hasMore')      # Variavel recebe true ou false da cunsulta
+        for response in responses.get('items'):   # Para cada Resposta(items) verifique as informações abaixo e armazene na variavel correspondente
 
             _id = response.get("id")
             _question_id = response.get("questionId")
@@ -90,10 +90,10 @@ def capture_responses(only_news=False):
             _commentary = response.get("commentary")
             _value = response.get("value")
 
-            result = db.fetchone(f"SELECT id FROM movidesk_responses where id = '{_id}'")
+            result = db.fetchone(f"SELECT id FROM movidesk_responses where id = '{_id}'") # Variavel recebe a função do select de virificar o id no bd
 
-            __value = _value if _value is not None else "null"
-            __commentary = f"'{_commentary.encode('utf-8').decode('unicode-escape')}'" if _commentary is not None else "null"
+            __value = _value if _value is not None else "null"            # consertando visualização do "None" para "null"
+            __commentary = f"'{_commentary.encode('utf-8').decode('unicode-escape')}'" if _commentary is not None else "null" # consertando comentarios fora do padrão, em branco ou com pular linha.
             if result is None:
                 db.execute(f"""INSERT INTO movidesk_responses 
                            (id, question_id, type, ticket_id, client_id, response_date, value, commentary) 
@@ -113,6 +113,7 @@ def capture_responses(only_news=False):
             _i += 1
             print(f"{_i}: {_id}, {_question_id}, {_type}, {_ticket_id}, {_client_id}, "
                   f"{_response_date}, {_value}, {_commentary}")
+
             _last = _id
         db.commit()
     db.disconect()
@@ -120,5 +121,5 @@ def capture_responses(only_news=False):
 
 if __name__ == '__main__':
     # create_tables()
-    capture_questions()
+    #capture_questions()
     capture_responses(True)
