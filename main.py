@@ -92,7 +92,7 @@ def capture_responses(only_news=False):
 
             result = db.fetchone(f"SELECT id FROM movidesk_responses where id = '{_id}'") # Variavel recebe a função do select de virificar o id no bd
 
-            __value = _value if _value is not None else "null"            # consertando visualização do "None" para "null"
+            __value = _value if _value is not None else "null"            # consertando visualização da nota - de "None" para "null"
             __commentary = f"'{_commentary.encode('utf-8').decode('unicode-escape')}'" if _commentary is not None else "null" # consertando comentarios fora do padrão, em branco ou com pular linha.
             if result is None:
                 db.execute(f"""INSERT INTO movidesk_responses 
