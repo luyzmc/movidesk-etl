@@ -67,7 +67,7 @@ def capture_questions():
 # centralizando Respostas da pesquisa de satisfação
 def capture_responses(only_news=False):
     _has_more = True                              # Parametro inicial para ver se tem mais paginas para serem consultadas na API
-    _last = ''                                    # Parametro inicial para quant de linhas
+    _last = ''                                    # Parametro inicial para lembrar do ultimo id quando estiver trocando de pagina
     _last_response_date = ''                      # Parametro inicial para data da ultima respsta em banco
     db = DB.connect()                             # Abre conexão com banco de dados para consultar a ultima data de resposta e fazer os updates ou insert necessarios.
     if only_news:                                 # Verificar no banco de dados a ultima data de resposta e armazena em uma variavel
@@ -90,16 +90,16 @@ def capture_responses(only_news=False):
             _commentary = response.get("commentary")
             _value = response.get("value")
 
-            result = db.fetchone(f"SELECT id FROM movidesk_responses where id = '{_id}'") # Variavel recebe a função do select de virificar o id no bd
+            result = db.fetchone(f"SELECT id FROM movidesk_responses where id = '{_id}'") # Variavel recebe a função do select de verificar o id no BD
 
             __value = _value if _value is not None else "null"            # consertando visualização da nota - de "None" para "null"
             __commentary = f"'{_commentary.encode('utf-8').decode('unicode-escape')}'" if _commentary is not None else "null" # consertando comentarios fora do padrão, em branco ou com pular linha.
-            if result is None:
+            if result is None:                                            # if para testar se o id recebido já existe no BD - nesse caso se não existir, chama a função de inserir a linha.
                 db.execute(f"""INSERT INTO movidesk_responses 
                            (id, question_id, type, ticket_id, client_id, response_date, value, commentary) 
                     VALUES ('{_id}', '{_question_id}', {_type}, {_ticket_id}, '{_client_id}', '{_response_date}', 
                            {__value}, {__commentary})""")
-            else:
+            else:                                                         # se não, ele faz um update, atualizando a informação existente.
                 db.execute(f"""UPDATE movidesk_responses SET
                                     question_id = '{_question_id}',
                                     type = {_type},
@@ -111,12 +111,12 @@ def capture_responses(only_news=False):
                                     WHERE id = '{_id}'""")
 
             _i += 1
-            print(f"{_i}: {_id}, {_question_id}, {_type}, {_ticket_id}, {_client_id}, "
+            print(f"{_i}: {_id}, {_question_id}, {_type}, {_ticket_id}, {_client_id}, "     # escreve o que está sendo inserido
                   f"{_response_date}, {_value}, {_commentary}")
 
-            _last = _id
-        db.commit()
-    db.disconect()
+            _last = _id                                                                     # gravando o ultimo id recebido para dar continuidade na proxima pagina
+        db.commit()                                                                         # comita no BD o que foi encontrado
+    db.disconect()                                                                          # desconecta do BD
 
 
 if __name__ == '__main__':
