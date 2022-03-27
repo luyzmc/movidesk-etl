@@ -5,7 +5,6 @@ Lendo as informações de pesquisas e respostas de satisfação do cliente API d
 
 Escrevendo em um BD postgres
 
-
 # Configurar
 
 ### Intalar componetes
