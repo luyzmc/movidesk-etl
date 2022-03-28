@@ -121,25 +121,26 @@ def capture_responses(only_news=False):
 
 
 def capture_status_Histories(): # esse skip é como vou trocar de pagina... assim que der 1000 tickets preciso inserir no lugar do '0'
-    _cont_id = 1
     _i = 0
+    _has_more = True
     status_histories_lista = []
-   # while _cont_id <= 1000:
-    histories_text = movidesk.status_histories()
-    status_histories = json.loads(histories_text)
-    for __id in status_histories.get:
-        _cont_id += 1
-        _ticket_id = __id.get("id")
-        for status_historic in status_histories.get('statusHistories'):
-            _status = status_historic.get("status")
-            _justification = status_historic.get("justification")
-            _changedDate = status_historic.get("changedDate")
-            _full_time = status_historic.get("permanencyTimeFullTime")
-            _workingTime = status_historic.get("permanencyTimeWorkingTime")
-
+    while _has_more:
+        tickets_text = movidesk.status_histories(_i)
+        tickets = json.loads(tickets_text)
+        _has_more = len(tickets) == 1000
+        for ticket in tickets:
+            ticket_id = ticket.get("id")
+            status_histories = ticket.get("statusHistories")
             _i += 1
-            print(f"{_i}:, {_status}, {_justification}, {_changedDate}, {_full_time}, {_workingTime}")
-        print(f"{_cont_id}: {_ticket_id}")
+            for status_historic in status_histories:
+                _status = status_historic.get("status")
+                _justification = status_historic.get("justification")
+                _changedDate = status_historic.get("changedDate")
+                _full_time = status_historic.get("permanencyTimeFullTime")
+                _workingTime = status_historic.get("permanencyTimeWorkingTime")
+
+                print(f"{_i}:, {_status}, {_justification}, {_changedDate}, {_full_time}, {_workingTime}, {ticket_id}")
+
 
 
     # else:

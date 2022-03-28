@@ -19,7 +19,7 @@ def responses(after: str = '', after_date: str = ''):
     return response.text
 
 
-def status_histories(skip: str = 0):
+def status_histories(skip: int = 0):
     url = f"{URL}/tickets?token={TOKEN}&$select=id&$skip={skip}&$expand=statusHistories&$filter=createdDate gt 2022-01-01T00:00:00.00z"
     response = requests.request("GET", url)
     return response.text
