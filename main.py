@@ -28,9 +28,18 @@ def create_tables():
     )""")
     db.execute("""create unique index movidesk_responses_id_uindex on movidesk_responses (id)""")
     db.execute("""alter table movidesk_responses add constraint movidesk_responses_pk primary key (id)""")
-    db.execute("""alter table movidesk_responses 
-        add constraint movidesk_responses_movidesk_questions_id_fk 
+    db.execute("""alter table movidesk_responses
+        add constraint movidesk_responses_movidesk_questions_id_fk
         foreign key (question_id) references movidesk_questions""")
+
+    db.execute("""create table movidesk_status_histories(
+        ticket_id int not null,
+        status varchar(50) not null,
+        justification varchar(50),
+        changed_date timestamp not null,
+        full_time decimal,
+        working_time decimal
+    )""")
     db.commit()
     db.disconect()
 
@@ -120,7 +129,7 @@ def capture_responses(only_news=False):
 
 
 
-def capture_status_Histories():
+def capture_status_histories():
     _i = 0
     _has_more = True
     while _has_more:
@@ -144,7 +153,7 @@ def capture_status_Histories():
 
 
 if __name__ == '__main__':
-    # create_tables()
+    create_tables()
     #capture_questions()
-    capture_responses(True)
-    #capture_status_Histories()
+    #capture_responses(True)
+    #capture_status_histories()
