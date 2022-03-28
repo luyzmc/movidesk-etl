@@ -119,7 +119,28 @@ def capture_responses(only_news=False):
     db.disconect()                                                                          # desconecta do BD
 
 
+
+def capture_status_Histories(_skip = 0 ): # esse skip é como vou trocar de pagina... assim que der 1000 tickets preciso inserir no lugar do '0'
+    _cont_id = 0
+    while _skip:
+        responses_text = movidesk.status_histories(_skip)
+        responses = json.loads(responses_text)
+        for response in responses.get('statusHistories'):
+
+            _id = response.get("id")                    # esse id nao está dentro de statushistories, acho q nao vai funcionar desse jeito e preciso contar ele fora desse laço
+            _status = response.get("status")
+            _justification = response.get("justification")
+            _changedDate = response.get("changedDate")
+            _full_time = response.get("permanencyTimeFullTime")
+            _workingTime = response.get("permanencyTimeWorkingTime")
+
+            _cont_id += 1
+            print(f"{_cont_id}: {_id}, {_status}, {_justification}, {_changedDate}, {_full_time}")
+
+
+
 if __name__ == '__main__':
     # create_tables()
     #capture_questions()
-    capture_responses(True)
+    #capture_responses(True)
+    capture_status_Histories()
