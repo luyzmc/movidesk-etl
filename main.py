@@ -120,27 +120,34 @@ def capture_responses(only_news=False):
 
 
 
-def capture_status_Histories(_skip = 0 ): # esse skip é como vou trocar de pagina... assim que der 1000 tickets preciso inserir no lugar do '0'
-    _cont_id = 0
-    while _skip:
-        responses_text = movidesk.status_histories(_skip)
-        responses = json.loads(responses_text)
-        for response in responses.get('statusHistories'):
+def capture_status_Histories(): # esse skip é como vou trocar de pagina... assim que der 1000 tickets preciso inserir no lugar do '0'
+    _cont_id = 1
+    _i = 0
+   # while _cont_id <= 1000:
+    histories_text = movidesk.status_histories()
+    status_histories = json.loads(histories_text)
+    for __id in status_histories.get:
+        _cont_id += 1
+        _ticket_id = __id.get("id")
+        for status_historic in status_histories.get('statusHistories'):
+            _status = status_historic.get("status")
+            _justification = status_historic.get("justification")
+            _changedDate = status_historic.get("changedDate")
+            _full_time = status_historic.get("permanencyTimeFullTime")
+            _workingTime = status_historic.get("permanencyTimeWorkingTime")
 
-            _id = response.get("id")                    # esse id nao está dentro de statushistories, acho q nao vai funcionar desse jeito e preciso contar ele fora desse laço
-            _status = response.get("status")
-            _justification = response.get("justification")
-            _changedDate = response.get("changedDate")
-            _full_time = response.get("permanencyTimeFullTime")
-            _workingTime = response.get("permanencyTimeWorkingTime")
+            _i += 1
+            print(f"{_i}:, {_status}, {_justification}, {_changedDate}, {_full_time}, {_workingTime}")
+        print(f"{_cont_id}: {_ticket_id}")
 
-            _cont_id += 1
-            print(f"{_cont_id}: {_id}, {_status}, {_justification}, {_changedDate}, {_full_time}")
 
+    # else:
+      #  _skip = _skip + _cont_id
+      #  _cont_id = 1
 
 
 if __name__ == '__main__':
     # create_tables()
     #capture_questions()
-    #capture_responses(True)
-    capture_status_Histories()
+    capture_responses(True)
+    #capture_status_Histories(0)
