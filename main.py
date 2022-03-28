@@ -120,10 +120,9 @@ def capture_responses(only_news=False):
 
 
 
-def capture_status_Histories(): # esse skip é como vou trocar de pagina... assim que der 1000 tickets preciso inserir no lugar do '0'
+def capture_status_Histories():
     _i = 0
     _has_more = True
-    status_histories_lista = []
     while _has_more:
         tickets_text = movidesk.status_histories(_i)
         tickets = json.loads(tickets_text)
@@ -143,13 +142,9 @@ def capture_status_Histories(): # esse skip é como vou trocar de pagina... assi
 
 
 
-    # else:
-      #  _skip = _skip + _cont_id
-      #  _cont_id = 1
-
 
 if __name__ == '__main__':
     # create_tables()
     #capture_questions()
-    #capture_responses(True)
-    capture_status_Histories()
+    capture_responses(True)
+    #capture_status_Histories()
