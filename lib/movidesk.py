@@ -23,4 +23,3 @@ def status_histories(skip: str = 0):
     url = f"{URL}/survey/tickets?token={TOKEN}&$select=id&$skip={skip}&$expand=statusHistories&$filter=createdDate gt 2022-01-01T00:00:00.00z"
     response = requests.request("GET", url)
     return response.text
-
