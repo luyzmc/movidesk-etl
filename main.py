@@ -128,12 +128,16 @@ def capture_responses(only_news=False):
     db.disconect()                                                                          # desconecta do BD
 
 
-
 def capture_status_histories():
     _i = 0
     _has_more = True
+    _last = ''
+    db = DB.connect()
+    resp = db.fetchone('select changed_date from movidesk_status_histories order by changed_date desc limit 1')
+    if resp is not None:
+        _last = resp[0]
     while _has_more:
-        tickets_text = movidesk.status_histories(_i)
+        tickets_text = movidesk.status_histories(_i, str(_last).replace(' ', 'T'))
         tickets = json.loads(tickets_text)
         _has_more = len(tickets) == 1000
         for ticket in tickets:
@@ -147,13 +151,22 @@ def capture_status_histories():
                 _full_time = status_historic.get("permanencyTimeFullTime")
                 _workingTime = status_historic.get("permanencyTimeWorkingTime")
 
+                if _changedDate > _last:
+                    __full_time = _full_time if _full_time is not None else "null"
+                    __workingTime = _workingTime if _workingTime is not None else "null"
+                    __justification = f"'{_justification.encode('latin1').decode('unicode-escape')}'" if _justification is not None else "null"
+                    db.execute(f"""INSERT INTO movidesk_status_histories 
+                                           (ticket_id, status, justification, changed_date, full_time, working_time) 
+                                    VALUES ({ticket_id}, '{_status}', {__justification}, '{_changedDate}', {__full_time},{__workingTime})""")
+
                 print(f"{_i}:, {_status}, {_justification}, {_changedDate}, {_full_time}, {_workingTime}, {ticket_id}")
 
-
+        db.commit()                                                                         # comita no BD o que foi encontrado
+    db.disconect()
 
 
 if __name__ == '__main__':
-    create_tables()
+    #create_tables()
     #capture_questions()
     #capture_responses(True)
-    #capture_status_histories()
+    capture_status_histories()
