@@ -1,6 +1,9 @@
+from datetime import datetime
+
 from lib import movidesk
 from lib.db import DB
 import json
+
 
 
 def create_tables():
@@ -149,17 +152,20 @@ def capture_status_histories():
                 _justification = status_historic.get("justification")
                 _changedDate = status_historic.get("changedDate")
                 _full_time = status_historic.get("permanencyTimeFullTime")
-                _workingTime = status_historic.get("permanencyTimeWorkingTime")
+                _workingTime = status_historic.get('permanencyTimeWorkingTime')
 
-                if _changedDate > _last:
-                    __full_time = _full_time if _full_time is not None else "null"
-                    __workingTime = _workingTime if _workingTime is not None else "null"
-                    __justification = f"'{_justification.encode('latin1').decode('unicode-escape')}'" if _justification is not None else "null"
+                _changedDate = _changedDate.replace(_changedDate[19:], '')
+                __changedDate = datetime.strptime(_changedDate, '%Y-%m-%dT%H:%M:%S')
+                __full_time = _full_time if _full_time is not None else "null"
+                __workingTime = _workingTime if _workingTime is not None else "null"
+                __justification = f"'{_justification.encode('latin1').decode('unicode-escape')}'" if _justification is not None else "null"
+
+                if __changedDate > _last:
                     db.execute(f"""INSERT INTO movidesk_status_histories 
-                                           (ticket_id, status, justification, changed_date, full_time, working_time) 
-                                    VALUES ({ticket_id}, '{_status}', {__justification}, '{_changedDate}', {__full_time},{__workingTime})""")
+                       (ticket_id, status, justification, changed_date, full_time, working_time) 
+                        VALUES ({ticket_id}, '{_status}', {__justification}, {__changedDate}, {__full_time},{__workingTime})""")
 
-                print(f"{_i}:, {_status}, {_justification}, {_changedDate}, {_full_time}, {_workingTime}, {ticket_id}")
+                print(f"{_i}:, {_status}, {_justification}, {__changedDate}, {_full_time}, {_workingTime}, {ticket_id}")
 
         db.commit()                                                                         # comita no BD o que foi encontrado
     db.disconect()
