@@ -134,13 +134,13 @@ def capture_responses(only_news=False):
 def capture_status_histories():
     _i = 0
     _has_more = True
-    _last = '2022-03-28T00:00:00.00'
+    _last = ''
     db = DB.connect()
-#  resp = db.fetchone('select changed_date from movidesk_status_histories order by changed_date desc limit 1')
-   # if resp is not None:
-   #     _last = resp[0]
+    resp = db.fetchone('select changed_date from movidesk_status_histories order by changed_date desc limit 1')
+    if resp is not None:
+       _last = str(resp[0])
     while _has_more:
-        tickets_text = movidesk.status_histories(_i, _last)
+        tickets_text = movidesk.status_histories(_i, _last.replace(' ', 'T'))
         tickets = json.loads(tickets_text)
         _has_more = len(tickets) == 1000
 
@@ -155,21 +155,17 @@ def capture_status_histories():
                 _full_time = status_historic.get("permanencyTimeFullTime")
                 _workingTime = status_historic.get('permanencyTimeWorkingTime')
 
-                _changedDate = _changedDate.replace(_changedDate[19:], '')
-                __changedDate = datetime.strptime(_changedDate, '%Y-%m-%dT%H:%M:%S')
+                __changedDate = _changedDate.replace('T', ' ')
 
-                __last = _changedDate.replace(_last[19:], '')
-                ___last = datetime.strptime(__last, '%Y-%m-%dT%H:%M:%S')
-
-                if __changedDate > ___last:
+                if __changedDate > _last:
                     __full_time = _full_time if _full_time is not None else "null"
                     __workingTime = _workingTime if _workingTime is not None else "null"
                     __justification = f"'{_justification.encode('latin1').decode('unicode-escape')}'" if _justification is not None else "null"
                     db.execute(f"""INSERT INTO movidesk_status_histories 
                        (ticket_id, status, justification, changed_date, full_time, working_time) 
-                        VALUES ({ticket_id}, '{_status}', {__justification}, {__changedDate}, {__full_time},{__workingTime})""")
+                        VALUES ({ticket_id}, '{_status}', {__justification}, '{__changedDate}', {__full_time},{__workingTime})""")
 
-                print(f"{_i}:, {_status}, {_justification}, {__changedDate}, {_full_time}, {_workingTime}, {ticket_id}")
+                print(f"{_i}({__changedDate > _last}): {_status}, {_justification}, {__changedDate}, {_full_time}, {_workingTime}, {ticket_id}")
 
         db.commit()                                                                         # comita no BD o que foi encontrado
     db.disconect()
