@@ -171,8 +171,30 @@ def capture_status_histories():
     db.disconect()
 
 
+def capturas_tickets_eq_interna():
+    _i = 0
+    _has_more = True
+    while _has_more:
+        tickets_eq_interna = movidesk.tickets_aguardando_eq_interna(_i)
+        tickets = json.loads(tickets_eq_interna)
+        _has_more = len(tickets) == 1000
+
+        for ticket in tickets:
+            _ticket_pai = ticket.get("id")
+            _justificativa = ticket.get("justification")
+            _assembla = ticket.get("customFieldValues")
+            _ticket_filho = ticket.get("childrenTickets")
+            _i += 1
+            for assembla in _assembla:
+                _id_assembla = assembla.get("value")
+            for ticket_filho in _ticket_filho:
+                _id_ticket_filho = ticket_filho.get("id")
+            print(f"{_i}: {_ticket_pai}, {_justificativa}, {_id_assembla}, {_id_ticket_filho}")
+
+
 if __name__ == '__main__':
     #create_tables()
     #capture_questions()
     #capture_responses(True)
-    capture_status_histories()
+    #capture_status_histories()
+    capturas_tickets_eq_interna()

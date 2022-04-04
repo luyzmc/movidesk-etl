@@ -20,8 +20,16 @@ def responses(after: str = '', after_date: str = ''):
 
 
 def status_histories(skip: int = 0, after_date: str = ''):
-    filter = f"&$filter=lastUpdate gt {after_date}z" if after_date != '' else ''
+    filter = "&$filter=lastUpdate gt {after_date}z" if after_date != '' else ''
     url = f"{URL}/tickets?token={TOKEN}&$select=id,lastUpdate&$skip={skip}&$expand=statusHistories{filter}"
+    response = requests.request("GET", url)
+    return response.text
+
+
+def tickets_aguardando_eq_interna(skip: int = 0):
+    filter = f"&$filter=status eq 'Aguardando Equipe interna' and serviceSecondLevel eq 'Suporte ZG'"
+    expand = f"&$expand=childrenTickets,customFieldValues($filter=customFieldId eq 55366)"
+    url = f"{URL}/tickets?token={TOKEN}&$select=id,justification&$skip={skip}{expand}{filter}"
     response = requests.request("GET", url)
     return response.text
 
