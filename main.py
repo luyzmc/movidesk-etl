@@ -185,11 +185,23 @@ def capturas_tickets_eq_interna():
             _assembla = ticket.get("customFieldValues")
             _ticket_filho = ticket.get("childrenTickets")
             _i += 1
+            _id_assembla = None
+            _id_ticket_filho = None
             for assembla in _assembla:
-                _id_assembla = assembla.get("value")
+                if assembla.get("value") != '':
+                    _id_assembla = assembla.get("value")
             for ticket_filho in _ticket_filho:
-                _id_ticket_filho = ticket_filho.get("id")
-            print(f"{_i}: {_ticket_pai}, {_justificativa}, {_id_assembla}, {_id_ticket_filho}")
+                if ticket_filho.get("id") != '':
+                    _id_ticket_filho = ticket_filho.get("id")
+                    inf_tickets_filho = movidesk.obtendo_tickets(_id_ticket_filho)
+                    _inf_tickets_filho = json.loads(inf_tickets_filho)
+                    _status_ticket_filho =_inf_tickets_filho.get("status")
+                    _servico_ticket_filho = _inf_tickets_filho.get("serviceSecondLevel")
+                    _categoria_ticket_filho = _inf_tickets_filho.get("category")
+                    if _justificativa != 'Dev' and _status_ticket_filho in ('Fechado', 'Resolvido'):
+                        print(f"{_i}: {_ticket_pai}, {_justificativa}, {_id_assembla}, {_id_ticket_filho},{_status_ticket_filho},{_servico_ticket_filho},{_categoria_ticket_filho}")
+
+
 
 
 if __name__ == '__main__':
@@ -197,4 +209,4 @@ if __name__ == '__main__':
     #capture_questions()
     #capture_responses(True)
     #capture_status_histories()
-    capturas_tickets_eq_interna()
+    #capturas_tickets_eq_interna()
