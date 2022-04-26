@@ -38,3 +38,13 @@ def obtendo_tickets(id: str = ''):
     url = f"{URL}/tickets?token={TOKEN}&id={id}"
     response = requests.request("GET", url)
     return response.text
+
+
+def horas_extras(skip: int = 0):
+    filter = f"&$filter=serviceFirstLevel eq 'Controle de horas'"
+    expand = f"&$expand=customFieldValues($expand=items)"
+    url = f"{URL}/tickets?token={TOKEN}&$select=id&$skip={skip}{expand}{filter}"
+    response = requests.request("GET", url)
+    return response.text
+
+
